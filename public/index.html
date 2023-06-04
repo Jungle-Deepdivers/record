@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Text-to-Speech</title>
+</head>
+<body>
+  <form id="textForm">
+    <input type="text" id="textInput" placeholder="텍스트 입력">
+    <button type="submit">변환하기</button>
+  </form>
+  <audio id="audioPlayer" controls></audio>
+
+  <script>
+    const form = document.getElementById('textForm');
+    const input = document.getElementById('textInput');
+    const audioElement = document.getElementById('audioPlayer');
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const text = input.value;
+
+      try {
+        const response = await fetch('/text-to-speech', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ text })
+        });
+
+        if (response.ok) {
+          const blob = await response.blob();
+          const url = URL.createObjectURL(blob);
+          audioElement.src = url;
+          audioElement.play();
+        } else {
+          console.error('서버 응답이 실패했습니다.');
+        }
+      } catch (error) {
+        console.error('요청 중 오류가 발생했습니다.', error);
+      }
+    });
+  </script>
+</body>
+</html>
